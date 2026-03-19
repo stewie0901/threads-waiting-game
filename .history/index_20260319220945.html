@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>v3 - Transition</title>
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; }
+        .center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .hidden { display: none; }
+        .logo { font-size: 60px; animation: pulse 1.8s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div id="loading" class="center">
+        <div class="logo">@</div>
+        <p>Loading...</p>
+    </div>
+    <div id="error" class="center hidden">
+        <h2>The feed is taking a breath.</h2>
+        <p style="opacity:0.5">Servers are slower than usual.</p>
+    </div>
+    <script>
+        setTimeout(() => {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error').classList.remove('hidden');
+        }, 2500);
+    </script>
+</body>
+</html>
