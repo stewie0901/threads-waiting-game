@@ -1,28 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>v4 - Interaction</title>
+    <title>v5 - Core Mechanic</title>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; }
-        .center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-        .hidden { display: none; }
-        button { margin-top: 20px; padding: 10px 20px; border-radius: 20px; border: none; cursor: pointer; }
+        body { background: #000; color: #fff; font-family: sans-serif; overflow: hidden; margin: 0; }
+        #hud { position: fixed; top: 10px; left: 10px; z-index: 10; }
+        .dot { width: 50px; height: 50px; background: #fff; border-radius: 50%; position: absolute; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div id="error" class="center">
-        <h2>Stay with us.</h2>
-        <button onclick="goToGame()">Tap while you wait</button>
-    </div>
-    <div id="game" class="center hidden">
-        <h2>Game Started!</h2>
-        <p>Waiting for dots...</p>
-    </div>
+    <div id="hud">Score: <span id="score">0</span></div>
+    <div id="gameArea"></div>
+
     <script>
-        function goToGame() {
-            document.getElementById('error').classList.add('hidden');
-            document.getElementById('game').classList.remove('hidden');
+        let score = 0;
+        const gameArea = document.getElementById('gameArea');
+        const scoreDisplay = document.getElementById('score');
+
+        function spawnDot() {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            dot.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+            dot.style.top = Math.random() * (window.innerHeight - 50) + 'px';
+
+            dot.onclick = () => {
+                score += 10;
+                scoreDisplay.innerText = score;
+                dot.remove();
+            };
+            gameArea.appendChild(dot);
+            // 3秒後沒點擊自動消失
+            setTimeout(() => { if(dot.parentNode) dot.remove(); }, 3000);
         }
+        setInterval(spawnDot, 1000);
     </script>
 </body>
 </html>
