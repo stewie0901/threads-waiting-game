@@ -1,38 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>v5 - Core Mechanic</title>
+    <title>v6 - Feedback</title>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; overflow: hidden; margin: 0; }
-        #hud { position: fixed; top: 10px; left: 10px; z-index: 10; }
-        .dot { width: 50px; height: 50px; background: #fff; border-radius: 50%; position: absolute; cursor: pointer; }
+        body { background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
+        .dot { width: 44px; height: 44px; background: #fff; border-radius: 50%; position: absolute; transition: transform 0.1s; }
+        .dot:active { transform: scale(0.8); }
+        #hud { padding: 20px; font-size: 1.2rem; }
     </style>
 </head>
 <body>
-    <div id="hud">Score: <span id="score">0</span></div>
+    <div id="hud">Score: <span id="score">0</span> | Combo: <span id="combo">0</span></div>
     <div id="gameArea"></div>
 
     <script>
-        let score = 0;
-        const gameArea = document.getElementById('gameArea');
-        const scoreDisplay = document.getElementById('score');
+        let score = 0, combo = 0, speed = 1000;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        function spawnDot() {
+        function playSound() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.frequency.setValueAtTime(600 + (combo * 50), audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        function spawn() {
             const dot = document.createElement('div');
             dot.className = 'dot';
-            dot.style.left = Math.random() * (window.innerWidth - 50) + 'px';
-            dot.style.top = Math.random() * (window.innerHeight - 50) + 'px';
-
+            dot.style.left = Math.random() * 80 + 'vw';
+            dot.style.top = Math.random() * 80 + 'vh';
+            
             dot.onclick = () => {
-                score += 10;
-                scoreDisplay.innerText = score;
+                playSound();
+                combo++;
+                score += (10 * combo);
+                document.getElementById('score').innerText = score;
+                document.getElementById('combo').innerText = combo;
                 dot.remove();
             };
-            gameArea.appendChild(dot);
-            // 3秒後沒點擊自動消失
-            setTimeout(() => { if(dot.parentNode) dot.remove(); }, 3000);
+            document.getElementById('gameArea').appendChild(dot);
+            setTimeout(() => { if(dot.parentNode) { dot.remove(); combo = 0; } }, speed);
+            
+            if(speed > 400) speed -= 10; // 越玩越快
         }
-        setInterval(spawnDot, 1000);
+        setInterval(spawn, 800);
     </script>
 </body>
 </html>

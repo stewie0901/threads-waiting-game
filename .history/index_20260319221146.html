@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>v6 - Feedback</title>
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
+        .dot { width: 44px; height: 44px; background: #fff; border-radius: 50%; position: absolute; transition: transform 0.1s; }
+        .dot:active { transform: scale(0.8); }
+        #hud { padding: 20px; font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+    <div id="hud">Score: <span id="score">0</span> | Combo: <span id="combo">0</span></div>
+    <div id="gameArea"></div>
+
+    <script>
+        let score = 0, combo = 0, speed = 1000;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.frequency.setValueAtTime(600 + (combo * 50), audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        function spawn() {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            dot.style.left = Math.random() * 80 + 'vw';
+            dot.style.top = Math.random() * 80 + 'vh';
+            
+            dot.onclick = () => {
+                playSound();
+                combo++;
+                score += (10 * combo);
+                document.getElementById('score').innerText = score;
+                document.getElementById('combo').innerText = combo;
+                dot.remove();
+            };
+            document.getElementById('gameArea').appendChild(dot);
+            setTimeout(() => { if(dot.parentNode) { dot.remove(); combo = 0; } }, speed);
+            
+            if(speed > 400) speed -= 10; // 越玩越快
+        }
+        setInterval(spawn, 800);
+    </script>
+</body>
+</html>
