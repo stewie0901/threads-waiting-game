@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>v6.5 - Juice & Feedback</title>
+    <style>
+        body { background:#000; color:#fff; font-family:sans-serif; overflow:hidden; }
+        .dot { width:44px; height:44px; background:#fff; border-radius:50%; position:absolute; cursor:pointer; transition:0.1s; }
+        .burst { position:absolute; width:44px; height:44px; border-radius:50%; border:2px solid #fff; animation:burst 0.4s ease-out forwards; }
+        @keyframes burst { to { transform:scale(2); opacity:0; } }
+        #result { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; display:none; }
+        button { padding:10px 20px; border-radius:20px; cursor:pointer; }
+    </style>
+</head>
+<body>
+    <div id="hud">Score: <span id="score">0</span> | Combo: <span id="combo">0</span></div>
+    <div id="gameArea"></div>
+    <div id="result">
+        <h1>Time's Up!</h1>
+        <p id="finalScore"></p>
+        <button onclick="location.reload()">Restart</button>
+    </div>
+
+    <script>
+        let score=0, combo=0, lives=5, speed=900;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.frequency.setValueAtTime(600 + (combo * 20), audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        function createBurst(x, y) {
+            const b = document.createElement("div");
+            b.className="burst"; b.style.left=x+"px"; b.style.top=y+"px";
+            document.body.appendChild(b); setTimeout(()=>b.remove(), 400);
+        }
+
+        function spawn() {
+            if(lives <= 0) return;
+            const dot = document.createElement("div");
+            dot.className = "dot";
+            const x = Math.random()*(window.innerWidth-50), y = Math.random()*(window.innerHeight-50);
+            dot.style.left=x+"px"; dot.style.top=y+"px";
+
+            dot.onclick = () => {
+                playSound(); createBurst(x,y);
+                combo++; score += (10 * combo);
+                document.getElementById('score').innerText=score;
+                document.getElementById('combo').innerText=combo;
+                dot.remove();
+            };
+
+            document.getElementById('gameArea').appendChild(dot);
+            setTimeout(() => {
+                if(dot.parentNode) {
+                    dot.remove(); combo=0; lives--;
+                    if(lives<=0) {
+                        document.getElementById('gameArea').style.display='none';
+                        document.getElementById('result').style.display='block';
+                        document.getElementById('finalScore').innerText="Final Score: " + score;
+                    }
+                }
+            }, speed);
+            setTimeout(spawn, speed);
+            if(speed > 400) speed -= 15;
+        }
+        spawn();
+    </script>
+</body>
+</html>
