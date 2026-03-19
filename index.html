@@ -12,7 +12,10 @@ body {
     background:#000; color:#fff;
     font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     overflow:hidden; touch-action: none;
+    transition: background 0.5s ease;
 }
+
+body.danger { background: #1a0505; }
 
 .center {
     position:absolute; top:50%; left:50%;
@@ -22,101 +25,73 @@ body {
 .hidden { display:none !important; }
 
 /* ===== Threads Homepage Style ===== */
-.logo-container {
-    margin-bottom: 20px;
-    position: relative;
-    display: inline-block;
-}
-
-.logo { 
-    font-size: 84px; font-weight: 700; 
-    letter-spacing: -2px;
-}
-
-/* 模擬 Threads 加載的小圓圈線條 */
+.logo { font-size: 80px; font-weight: 700; letter-spacing: -2px; margin-bottom: 20px; }
 .loading-ring {
-    width: 24px; height: 24px;
-    border: 2px solid rgba(255,255,255,0.2);
-    border-top: 2px solid #fff;
-    border-radius: 50%;
-    margin: 20px auto;
-    animation: spin 0.8s linear infinite;
+    width: 22px; height: 22px; border: 1.5px solid rgba(255,255,255,0.1);
+    border-top: 1.5px solid #fff; border-radius: 50%;
+    margin: 20px auto; animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-
-.home-text { font-size: 15px; opacity: 0.5; font-weight: 400; }
+.home-text { font-size: 14px; opacity: 0.4; font-weight: 300; letter-spacing: 0.2px; line-height: 1.6; }
 
 button {
-    margin-top: 40px; padding: 12px 32px;
-    border-radius: 999px; border: 1px solid rgba(255,255,255,0.15);
-    background: #fff; color: #000;
-    font-size: 15px; font-weight: 600; cursor: pointer;
-    transition: 0.2s;
+    margin-top: 40px; padding: 10px 32px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.15);
+    background: #fff; color: #000; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s;
 }
-button:active { transform: scale(0.95); opacity: 0.8; }
+button:active { transform: scale(0.96); opacity: 0.8; }
 
 /* ===== Game Elements ===== */
 #gameArea { width:100vw; height:100vh; position:relative; }
-
 .dot {
-    width:48px; height:48px; border-radius:50%;
-    background:#fff; position:absolute; cursor:pointer;
+    width:50px; height:50px; border-radius:50%; background:#fff; position:absolute; cursor:pointer;
     animation: shrinkVar var(--duration) linear forwards;
 }
-
 @keyframes shrinkVar {
     0% { transform: scale(0); opacity: 0; }
     15% { transform: scale(1); opacity: 1; }
     85% { transform: scale(0.8); opacity: 1; }
     100% { transform: scale(0); opacity: 0; }
 }
-
 .burst {
-    position:absolute; width:48px; height:48px; border-radius:50%;
-    border:1.5px solid #fff; pointer-events: none;
-    animation: burstOut 0.4s ease-out forwards;
+    position:absolute; width:50px; height:50px; border-radius:50%; border:1px solid #fff;
+    pointer-events: none; animation: burstOut 0.4s ease-out forwards;
 }
 @keyframes burstOut { to { transform:scale(2); opacity:0; } }
 
-/* HUD */
-#hud {
-    position:fixed; top:40px; left:30px;
-    font-size:12px; font-weight: 600; letter-spacing: 0.5px;
-    z-index: 100; pointer-events: none;
-}
-#hud div { margin-bottom: 6px; opacity: 0.4; }
-#life { font-size: 18px; opacity: 1 !important; margin-top: 10px; }
+#hud { position:fixed; top:50px; left:30px; font-size:12px; font-weight: 400; letter-spacing: 0.8px; z-index: 100; pointer-events: none; }
+#hud div { margin-bottom: 8px; opacity: 0.3; }
+#life { font-size: 18px; opacity: 1 !important; margin-top: 12px; transition: 0.3s; }
 
-/* 震動與警示 */
-.shake { animation: shakeAnim 0.25s ease-in-out; }
-@keyframes shakeAnim {
-    0%, 100% { transform: translate(0,0); }
-    25% { transform: translate(-6px, 0); }
-    75% { transform: translate(6px, 0); }
+/* ===== Result Card (Fixed Centering) ===== */
+#result.center {
+    display: flex; justify-content: center; align-items: center;
+    width: 100vw; height: 100vh;
 }
-
-/* 結算排行榜 */
 .card {
-    background: rgba(255,255,255,0.06); padding: 40px 30px;
-    border-radius: 28px; backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-    width: 85%; max-width: 320px; border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.05); padding: 40px 30px; border-radius: 28px;
+    backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+    width: 90%; max-width: 360px; margin: 0 auto;
+    border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.3);
 }
-#leaderboard { margin: 20px 0; text-align: left; }
-.lb-row { display: flex; justify-content: space-between; margin: 8px 0; font-size: 14px; }
+.card h2 { font-size: 19px; font-weight: 600; margin-bottom: 6px; }
+#leaderboard { margin: 25px 0; text-align: left; }
+.lb-row { display: flex; justify-content: space-between; padding: 10px 0; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.lb-row:last-child { border-bottom: none; }
+
+.shake { animation: shakeAnim 0.2s ease-in-out; }
+@keyframes shakeAnim { 0%, 100% { transform: translate(0,0); } 25% { transform: translate(-5px, 0); } 75% { transform: translate(5px, 0); } }
 </style>
 </head>
 <body>
 
 <div id="homepage" class="center">
-    <div class="logo-container">
-        <div class="logo">@</div>
-    </div>
+    <div class="logo">@</div>
     <div id="homeStatus">
         <div class="loading-ring"></div>
-        <div class="home-text">Checking server...</div>
+        <div class="home-text">Connecting to your feed...</div>
     </div>
     <div id="homeAction" class="hidden">
-        <div class="home-text">Servers are currently occupied.</div>
+        <div class="home-text">The feed is currently refreshing.<br>Stay with us for a moment.</div>
         <button onclick="startGame()">Interactive Wait</button>
     </div>
 </div>
@@ -125,75 +100,56 @@ button:active { transform: scale(0.95); opacity: 0.8; }
     <div id="gameArea"></div>
     <div id="hud">
         <div>SCORE <b id="score">0</b></div>
-        <div>UPTIME <span id="time">0.0</span>s</div>
+        <div>SESSION <span id="time">0.0</span>s</div>
         <div id="life"></div>
     </div>
 </div>
 
 <div id="result" class="center hidden">
     <div class="card">
-        <div style="font-size:20px; font-weight:600; margin-bottom:5px;">Session Ended</div>
-        <div id="finalStat" style="font-size:14px; opacity:0.5; margin-bottom:20px;"></div>
-        
+        <h2>Session Summary</h2>
+        <div id="finalStat" style="font-size:13px; opacity:0.4; margin-bottom:10px;"></div>
         <div id="leaderboard"></div>
-        
-        <button onclick="location.reload()" style="margin-top:10px; width:100%;">Try Again</button>
+        <button onclick="goHome()" style="width:100%; background:transparent; border:1px solid rgba(255,255,255,0.2); color:#fff;">Dismiss</button>
+        <button onclick="retryGame()" style="width:100%; margin-top:10px;">Retry</button>
     </div>
 </div>
 
 <script>
-let state = {
-    score: 0, time: 0, speed: 1100, lives: 5, active: false, combo: 0
-};
+let state = { score: 0, time: 0, speed: 1100, lives: 5, active: false, combo: 0 };
+let audioCtx, gameLoopTimeout, clockInterval;
 
-let audioCtx;
-let gameLoopTimeout;
-let clockInterval;
-
-// 初始化音效 (必須在按鈕點擊時觸發)
-function initAudio() {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+function playBeep(freq, dur = 0.12) {
+    if (!audioCtx) return;
+    const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+    o.type = "sine"; o.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    g.gain.setValueAtTime(0.06, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+    o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + dur);
 }
 
-function playBeep(freq, dur = 0.1) {
-    if (!audioCtx || audioCtx.state === 'suspended') audioCtx.resume();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.start(); osc.stop(audioCtx.currentTime + dur);
-}
-
-// Homepage 模擬加載
-setTimeout(() => {
+// 首頁 Loading 模擬
+let homeTimer = setTimeout(() => {
     document.getElementById('homeStatus').classList.add('hidden');
     document.getElementById('homeAction').classList.remove('hidden');
-}, 2200);
+}, 2000);
 
 function startGame() {
-    initAudio();
-    state.active = true;
+    initAudio(); state.active = true;
     document.getElementById('homepage').classList.add('hidden');
     document.getElementById('game').classList.remove('hidden');
-
+    document.getElementById('result').classList.add('hidden');
     updateUI();
     runLoop();
-
-    clockInterval = setInterval(() => {
-        if(!state.active) return;
-        state.time += 0.1;
-        document.getElementById('time').innerText = state.time.toFixed(1);
-    }, 100);
+    clearInterval(clockInterval);
+    clockInterval = setInterval(() => { if(!state.active) return; state.time += 0.1; document.getElementById('time').innerText = state.time.toFixed(1); }, 100);
 }
 
 function runLoop() {
     if (!state.active) return;
     spawn();
-    // 持續加速度
-    state.speed = Math.max(380, state.speed * 0.985);
+    state.speed = Math.max(380, state.speed * 0.982);
     gameLoopTimeout = setTimeout(runLoop, state.speed);
 }
 
@@ -201,95 +157,77 @@ function spawn() {
     if (!state.active) return;
     const dot = document.createElement("div");
     dot.className = "dot";
-    
-    const size = 48;
-    const x = Math.random() * (window.innerWidth - size - 40) + 20;
-    const y = Math.random() * (window.innerHeight - size - 80) + 40;
-
+    const x = Math.random() * (window.innerWidth - 70) + 10;
+    const y = Math.random() * (window.innerHeight - 150) + 60;
     const duration = state.speed * 1.8;
     dot.style.setProperty('--duration', `${duration}ms`);
-    dot.style.left = `${x}px`;
-    dot.style.top = `${y}px`;
+    dot.style.left = `${x}px`; dot.style.top = `${y}px`;
 
     dot.onpointerdown = (e) => {
-        if (!state.active) return;
-        e.stopPropagation();
-        
+        if (!state.active) return; e.stopPropagation();
         if (state.lives < 5) state.lives++;
-        state.combo++;
-        state.score += (10 + Math.floor(state.combo / 5) * 5);
-        
-        playBeep(440 + (state.combo * 10)); // 隨連擊提高音頻
-        createBurst(x, y);
-        dot.remove();
-        updateUI();
+        state.combo++; state.score += (10 + Math.floor(state.combo / 5) * 5);
+        playBeep(440 + (state.combo * 8)); createBurst(x, y); dot.remove(); updateUI();
     };
 
     document.getElementById('gameArea').appendChild(dot);
-
-    // 漏掉點點的處理
     setTimeout(() => {
         if (dot.parentNode && state.active) {
-            dot.remove();
-            state.lives--;
-            state.combo = 0;
-            
-            if (state.lives > 0) {
-                playBeep(150, 0.2);
-                document.body.classList.add('shake');
-                setTimeout(() => document.body.classList.remove('shake'), 250);
-            }
-            
-            updateUI();
-            if (state.lives <= 0) endGame();
+            dot.remove(); state.lives--; state.combo = 0;
+            if (state.lives > 0) { playBeep(180, 0.2); document.body.classList.add('shake'); setTimeout(() => document.body.classList.remove('shake'), 200); }
+            updateUI(); if (state.lives <= 0) endGame();
         }
     }, duration);
 }
 
 function createBurst(x, y) {
-    const b = document.createElement("div");
-    b.className = "burst";
+    const b = document.createElement("div"); b.className = "burst";
     b.style.left = `${x}px`; b.style.top = `${y}px`;
-    document.getElementById('gameArea').appendChild(b);
-    setTimeout(() => b.remove(), 400);
+    document.getElementById('gameArea').appendChild(b); setTimeout(() => b.remove(), 400);
 }
 
 function updateUI() {
     document.getElementById('score').innerText = state.score;
     document.getElementById('life').innerText = "♥".repeat(state.lives);
+    state.lives === 1 ? document.body.classList.add('danger') : document.body.classList.remove('danger');
 }
 
 function endGame() {
     if (!state.active) return;
-    state.active = false;
-    
-    // 清除計時器防止死後多震或多發聲
-    clearTimeout(gameLoopTimeout);
-    clearInterval(clockInterval);
-
+    state.active = false; document.body.classList.remove('danger');
+    clearTimeout(gameLoopTimeout); clearInterval(clockInterval);
     document.getElementById('game').classList.add("hidden");
     document.getElementById('result').classList.remove("hidden");
-    
-    document.getElementById('finalStat').innerText = 
-        `${state.time.toFixed(1)}s uptime • Score ${state.score}`;
-    
+    document.getElementById('finalStat').innerText = `${state.time.toFixed(1)}s uptime • Score ${state.score}`;
     generateLeaderboard();
 }
 
+function goHome() {
+    document.getElementById('result').classList.add("hidden");
+    document.getElementById('homepage').classList.remove("hidden");
+    // 重置首頁狀態
+    document.getElementById('homeStatus').classList.remove('hidden');
+    document.getElementById('homeAction').classList.add('hidden');
+    clearTimeout(homeTimer);
+    homeTimer = setTimeout(() => {
+        document.getElementById('homeStatus').classList.add('hidden');
+        document.getElementById('homeAction').classList.remove('hidden');
+    }, 2000);
+}
+
+function retryGame() {
+    state.score = 0; state.time = 0; state.speed = 1100; state.lives = 5; state.combo = 0;
+    startGame();
+}
+
 function generateLeaderboard() {
-    const bots = ["luna", "alex", "noah", "mia", "zen"].map(n => ({
-        name: n, score: Math.floor(Math.random() * 1500) + 500
-    }));
+    const bots = ["luna", "alex", "noah", "mia", "zen"].map(n => ({ name: n, score: Math.floor(Math.random() * 1500) + 500 }));
     bots.push({ name: "YOU", score: state.score, isPlayer: true });
     bots.sort((a, b) => b.score - a.score);
-
-    let html = `<div style="font-size:11px; opacity:0.4; text-transform:uppercase; margin-bottom:12px; letter-spacing:1px;">Global Waitlist</div>`;
+    let html = `<div style="font-size:11px; opacity:0.3; text-transform:uppercase; margin-bottom:5px; letter-spacing:1px; font-weight:600;">Global Standing</div>`;
     bots.forEach((entry, i) => {
         const activeStyle = entry.isPlayer ? 'color:#fff; font-weight:600;' : 'opacity:0.4;';
-        html += `<div class="lb-row" style="${activeStyle}">
-            <span>${i + 1}. ${entry.name}</span>
-            <span>${entry.score}</span>
-        </div>`;
+        html += `<div class="lb-row" style="${activeStyle}"><span>${i + 1}. ${entry.name}</span><span>${entry.score}</span></div>`;
     });
     document.getElementById('leaderboard').innerHTML = html;
 }
