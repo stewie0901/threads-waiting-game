@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>v6 - Game Rules</title>
+    <style>
+        body { background:#000; color:#fff; font-family:sans-serif; overflow:hidden; }
+        #hud { position:fixed; top:20px; left:20px; line-height:1.5; }
+        .dot { width:44px; height:44px; background:#fff; border-radius:50%; position:absolute; cursor:pointer; }
+    </style>
+</head>
+<body>
+    <div id="hud">
+        <div>Score: <span id="score">0</span></div>
+        <div>Life: <span id="life">🤍🤍🤍🤍🤍</span></div>
+    </div>
+    <div id="gameArea"></div>
+
+    <script>
+        let score = 0;
+        let lives = 5;
+        let speed = 1000; // 初始速度
+        const gameArea = document.getElementById('gameArea');
+
+        function updateHUD() {
+            document.getElementById('score').innerText = score;
+            document.getElementById('life').innerText = "🤍".repeat(lives);
+        }
+
+        function spawnDot() {
+            if (lives <= 0) return;
+
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            dot.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+            dot.style.top = Math.random() * (window.innerHeight - 50) + 'px';
+
+            dot.onclick = () => {
+                score += 10;
+                updateHUD();
+                dot.remove();
+            };
+
+            gameArea.appendChild(dot);
+
+            setTimeout(() => {
+                if(dot.parentNode) {
+                    dot.remove();
+                    lives--;
+                    updateHUD();
+                    if(lives <= 0) alert("Game Over! Score: " + score);
+                }
+            }, speed);
+
+            // 難度曲線：越玩越快
+            if(speed > 500) speed -= 20;
+            setTimeout(spawnDot, speed);
+        }
+
+        spawnDot(); // 開始遊戲
+    </script>
+</body>
+</html>

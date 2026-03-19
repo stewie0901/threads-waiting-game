@@ -1,51 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>v6 - Feedback</title>
+    <meta charset="UTF-8">
+    <title>v6 - Game Rules</title>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
-        .dot { width: 44px; height: 44px; background: #fff; border-radius: 50%; position: absolute; transition: transform 0.1s; }
-        .dot:active { transform: scale(0.8); }
-        #hud { padding: 20px; font-size: 1.2rem; }
+        body { background:#000; color:#fff; font-family:sans-serif; overflow:hidden; }
+        #hud { position:fixed; top:20px; left:20px; line-height:1.5; }
+        .dot { width:44px; height:44px; background:#fff; border-radius:50%; position:absolute; cursor:pointer; }
     </style>
 </head>
 <body>
-    <div id="hud">Score: <span id="score">0</span> | Combo: <span id="combo">0</span></div>
+    <div id="hud">
+        <div>Score: <span id="score">0</span></div>
+        <div>Life: <span id="life">🤍🤍🤍🤍🤍</span></div>
+    </div>
     <div id="gameArea"></div>
 
     <script>
-        let score = 0, combo = 0, speed = 1000;
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let score = 0;
+        let lives = 5;
+        let speed = 1000; // 初始速度
+        const gameArea = document.getElementById('gameArea');
 
-        function playSound() {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.frequency.setValueAtTime(600 + (combo * 50), audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        function updateHUD() {
+            document.getElementById('score').innerText = score;
+            document.getElementById('life').innerText = "🤍".repeat(lives);
         }
 
-        function spawn() {
+        function spawnDot() {
+            if (lives <= 0) return;
+
             const dot = document.createElement('div');
             dot.className = 'dot';
-            dot.style.left = Math.random() * 80 + 'vw';
-            dot.style.top = Math.random() * 80 + 'vh';
-            
+            dot.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+            dot.style.top = Math.random() * (window.innerHeight - 50) + 'px';
+
             dot.onclick = () => {
-                playSound();
-                combo++;
-                score += (10 * combo);
-                document.getElementById('score').innerText = score;
-                document.getElementById('combo').innerText = combo;
+                score += 10;
+                updateHUD();
                 dot.remove();
             };
-            document.getElementById('gameArea').appendChild(dot);
-            setTimeout(() => { if(dot.parentNode) { dot.remove(); combo = 0; } }, speed);
-            
-            if(speed > 400) speed -= 10; // 越玩越快
+
+            gameArea.appendChild(dot);
+
+            setTimeout(() => {
+                if(dot.parentNode) {
+                    dot.remove();
+                    lives--;
+                    updateHUD();
+                    if(lives <= 0) alert("Game Over! Score: " + score);
+                }
+            }, speed);
+
+            // 難度曲線：越玩越快
+            if(speed > 500) speed -= 20;
+            setTimeout(spawnDot, speed);
         }
-        setInterval(spawn, 800);
+
+        spawnDot(); // 開始遊戲
     </script>
 </body>
 </html>
