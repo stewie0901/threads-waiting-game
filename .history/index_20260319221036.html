@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>v4 - Interaction</title>
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; }
+        .center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .hidden { display: none; }
+        button { margin-top: 20px; padding: 10px 20px; border-radius: 20px; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div id="error" class="center">
+        <h2>Stay with us.</h2>
+        <button onclick="goToGame()">Tap while you wait</button>
+    </div>
+    <div id="game" class="center hidden">
+        <h2>Game Started!</h2>
+        <p>Waiting for dots...</p>
+    </div>
+    <script>
+        function goToGame() {
+            document.getElementById('error').classList.add('hidden');
+            document.getElementById('game').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
