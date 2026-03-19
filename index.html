@@ -3,107 +3,94 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Threads Waiting Pro - Ultra Edition</title>
+<title>Threads Experience - Zenith</title>
 
 <style>
-/* 基礎重置與美化 */
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
 
 body {
-    background:#000;
-    color:#fff;
-    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    overflow:hidden;
-    touch-action: none;
+    background:#000; color:#fff;
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow:hidden; touch-action: none;
+    transition: background 0.3s;
 }
+
+/* 命懸一線的警示效果 */
+body.danger { background: #1a0505; }
 
 .center {
     position:absolute; top:50%; left:50%;
-    transform:translate(-50%,-50%); text-align:center; width: 90%;
+    transform:translate(-50%,-50%); text-align:center; width: 100%;
 }
 
 .hidden { display:none !important; }
 
-/* 平滑進場動畫 */
-.fade {
-    animation: fadeIn 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-}
-
+/* 介面動畫 */
+.fade { animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
 @keyframes fadeIn {
-    from { opacity:0; transform:translate(-50%,-45%) scale(0.95); }
+    from { opacity:0; transform:translate(-50%,-48%) scale(0.98); }
     to { opacity:1; transform:translate(-50%,-50%) scale(1); }
 }
 
-/* Logo 脈衝 */
-.logo {
-    font-size:80px; font-weight: bold; opacity:0.85;
-    animation: pulse 2s ease-in-out infinite; user-select: none;
-}
+.logo { font-size:80px; font-weight: bold; animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity:0.3; transform:scale(0.95); } 50% { opacity:1; transform:scale(1); } }
 
-@keyframes pulse {
-    0%, 100% { opacity:0.3; transform: scale(0.9); }
-    50% { opacity:1; transform: scale(1); }
-}
-
-.subtext { margin-top:15px; font-size:14px; opacity:0.5; letter-spacing: 0.5px; }
-
-/* 按鈕樣式 */
 button {
-    margin-top:25px; padding:14px 32px; border-radius:999px; border:none;
+    margin-top:30px; padding:14px 34px; border-radius:999px; border:none;
     background:#fff; color:#000; font-weight: 600; cursor:pointer;
-    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
-button:hover { transform:scale(1.05); background: #eee; }
-button:active { transform:scale(0.95); }
+button:active { transform:scale(0.9); opacity: 0.8; }
 
-/* 遊戲核心：全白美學 */
+/* 遊戲物件：增加縮小動畫 */
 #gameArea { width:100vw; height:100vh; position:relative; }
 
 .dot {
     width:50px; height:50px; border-radius:50%;
     background:#fff; position:absolute; cursor:pointer;
-    animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 0 20px rgba(255,255,255,0.2);
+    /* 這裡讓白點在生命週期內慢慢縮小，增加難度暗示 */
+    animation: shrinkVar var(--duration) linear forwards;
 }
 
-@keyframes pop {
-    from { transform:scale(0); opacity:0; }
-    to { transform:scale(1); opacity:1; }
-}
-
-/* 點擊與漏掉的反饋 */
-.shake { animation: shake 0.3s ease-in-out; }
-@keyframes shake {
-    0%, 100% { transform: translate(0,0); }
-    25% { transform: translate(-5px, 5px); }
-    50% { transform: translate(5px, -5px); }
-    75% { transform: translate(-5px, -5px); }
+@keyframes shrinkVar {
+    0% { transform: scale(0); opacity: 0; }
+    15% { transform: scale(1); opacity: 1; }
+    80% { transform: scale(0.8); opacity: 1; }
+    100% { transform: scale(0); opacity: 0; }
 }
 
 .burst {
     position:absolute; width:50px; height:50px; border-radius:50%;
-    border:2px solid white; pointer-events: none;
-    animation: burst 0.5s ease-out forwards;
+    border:2px solid #fff; pointer-events: none;
+    animation: burstOut 0.5s ease-out forwards;
 }
-@keyframes burst {
-    to { transform:scale(2.5); opacity:0; border-width: 0px; }
+@keyframes burstOut {
+    to { transform:scale(2.5); opacity:0; }
 }
 
 /* HUD 質感 */
 #hud {
-    position:fixed; top:25px; left:25px;
-    font-size:14px; font-variant-numeric: tabular-nums;
-    text-transform: uppercase; letter-spacing: 1px;
-    z-index: 100; pointer-events: none;
+    position:fixed; top:30px; left:30px;
+    font-size:12px; font-weight: 500; letter-spacing: 1.5px;
+    z-index: 100; pointer-events: none; text-transform: uppercase;
 }
-#hud div { margin-bottom: 5px; opacity: 0.7; }
-#life { font-size: 18px; opacity: 1 !important; margin-top: 10px; color: #fff; }
+#hud div { margin-bottom: 8px; opacity: 0.5; }
+#life { font-size: 18px; opacity: 1 !important; margin-top: 12px; transition: 0.3s; }
 
-/* 結算畫面 */
+/* 震動 */
+.shake { animation: shakeAnim 0.3s ease-in-out; }
+@keyframes shakeAnim {
+    0%, 100% { transform: translate(0,0); }
+    20% { transform: translate(-8px, 0); }
+    40% { transform: translate(8px, 0); }
+    60% { transform: translate(-4px, 0); }
+    80% { transform: translate(4px, 0); }
+}
+
 .card {
-    background:rgba(255,255,255,0.08); padding:40px 30px;
-    border-radius:24px; backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-    border: 1px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.06); padding:50px 40px;
+    border-radius:28px; backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px);
+    border: 1px solid rgba(255,255,255,0.1); display: inline-block;
 }
 </style>
 </head>
@@ -111,143 +98,146 @@ button:active { transform:scale(0.95); }
 
 <div id="loading" class="center fade">
     <div class="logo">@</div>
-    <div class="subtext">Optimizing feed...</div>
 </div>
 
 <div id="error" class="center hidden fade">
-    <div style="font-size:22px; font-weight:600;">Server is slow.</div>
-    <div class="subtext">Enjoy a minimal session while we load.</div>
-    <button onclick="startGame()">Interactive Wait</button>
+    <div style="font-size:20px; font-weight:500;">Connection stalled.</div>
+    <button onclick="startGame()">Start Minimal Session</button>
 </div>
 
 <div id="game" class="hidden">
     <div id="gameArea"></div>
     <div id="hud">
-        <div>Score: <b id="score">0</b></div>
-        <div>Time: <span id="time">0.0</span>s</div>
+        <div>Score <b id="score">0</b></div>
+        <div>Uptime <span id="time">0.0</span>s</div>
         <div id="life"></div>
     </div>
 </div>
 
 <div id="result" class="center hidden fade">
     <div class="card">
-        <h2 style="margin-bottom:10px;">Session Summary</h2>
-        <p id="finalScore" style="opacity:0.8; margin-bottom:20px;"></p>
-        <div id="leaderboard" style="margin-bottom: 25px;"></div>
-        <button onclick="location.reload()">Refresh Feed</button>
+        <h2 style="margin-bottom:10px; font-weight:600;">Session End</h2>
+        <p id="finalScore" style="opacity:0.5; margin-bottom:30px; font-size:15px;"></p>
+        <button onclick="location.reload()">Return to Feed</button>
     </div>
 </div>
 
 <script>
 const CONFIG = {
-    initialSpeed: 1000,
-    minSpeed: 380,
-    speedFactor: 0.985, // 每次點擊速度變快 1.5%
+    startSpeed: 1100,
+    minSpeed: 350,
+    accel: 0.982, // 每次點擊速度快 1.8%
     maxLives: 5
 };
 
 let state = {
     score: 0,
     time: 0,
-    speed: CONFIG.initialSpeed,
+    speed: CONFIG.startSpeed,
     lives: CONFIG.maxLives,
-    isActive: false
+    active: false,
+    combo: 0
 };
 
-let timers = { game: null, clock: null };
 let audioCtx;
+let gameLoopTimeout;
 
 function initAudio() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 }
 
-function playSound(freq) {
+function beep(f, d = 0.15, v = 0.1) {
     if (!audioCtx) return;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = "triangle";
-    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = "sine";
+    o.frequency.setValueAtTime(f, audioCtx.currentTime);
+    g.gain.setValueAtTime(v, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + d);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + d);
 }
 
-// 導航邏輯
+// 介面切換
 setTimeout(() => {
-    if(!state.isActive) {
+    if(!state.active) {
         document.getElementById('loading').classList.add("hidden");
         document.getElementById('error').classList.remove("hidden");
     }
-}, 2000);
+}, 1800);
 
 function startGame() {
     initAudio();
-    state.isActive = true;
+    state.active = true;
     document.getElementById('error').classList.add("hidden");
     document.getElementById('game').classList.remove("hidden");
 
-    updateLifeUI();
-    gameLoop();
+    updateUI();
+    runLoop();
 
-    timers.clock = setInterval(() => {
+    setInterval(() => {
+        if(!state.active) return;
         state.time += 0.1;
         document.getElementById('time').innerText = state.time.toFixed(1);
     }, 100);
 }
 
-// 控制速度加快的核心循環
-function gameLoop() {
-    if (!state.isActive) return;
-    spawnDot();
-    // 每次生成後，間隔縮短（變快）
-    state.speed = Math.max(CONFIG.minSpeed, state.speed * CONFIG.speedFactor);
-    timers.game = setTimeout(gameLoop, state.speed);
+function runLoop() {
+    if (!state.active) return;
+    spawn();
+    state.speed = Math.max(CONFIG.minSpeed, state.speed * CONFIG.accel);
+    gameLoopTimeout = setTimeout(runLoop, state.speed);
 }
 
-function spawnDot() {
+function spawn() {
     const dot = document.createElement("div");
     dot.className = "dot";
     
-    const size = 50;
-    const x = Math.random() * (window.innerWidth - size);
-    const y = Math.random() * (window.innerHeight - size);
+    // 隨機坐標 (保留邊距)
+    const x = Math.random() * (window.innerWidth - 70) + 10;
+    const y = Math.random() * (window.innerHeight - 70) + 10;
 
-    Object.assign(dot.style, { left: `${x}px`, top: `${y}px` });
+    // 設置 CSS 變數控制動畫時長，讓圓點消失時間與生成速度同步
+    const duration = state.speed * 1.8;
+    dot.style.setProperty('--duration', `${duration}ms`);
+    dot.style.left = `${x}px`;
+    dot.style.top = `${y}px`;
 
     dot.onpointerdown = (e) => {
         e.stopPropagation();
         
-        // --- 優化點：點到回血 ---
-        if (state.lives < CONFIG.maxLives) {
-            state.lives++;
-            updateLifeUI();
-        }
-
-        state.score += 10;
-        playSound(400 + (state.score / 2));
-        createBurst(x, y);
+        // 回血邏輯
+        if (state.lives < CONFIG.maxLives) state.lives++;
+        
+        state.combo++;
+        state.score += (10 + Math.floor(state.combo / 5) * 5); // 每 5 連擊加分更多
+        
+        beep(400 + (state.score % 1000), 0.2);
+        burst(x, y);
         dot.remove();
-        document.getElementById('score').innerText = state.score;
+        updateUI();
     };
 
     document.getElementById('gameArea').appendChild(dot);
 
-    // 圓點生命週期：隨著遊戲變快，白點消失也變快
+    // 漏掉點點
     setTimeout(() => {
         if (dot.parentNode) {
             dot.remove();
             state.lives--;
-            playSound(180);
+            state.combo = 0;
+            
+            beep(120, 0.3, 0.2);
             document.body.classList.add('shake');
             setTimeout(() => document.body.classList.remove('shake'), 300);
-            updateLifeUI();
-            if (state.lives <= 0) endGame();
+            
+            updateUI();
+            if (state.lives <= 0) die();
         }
-    }, state.speed * 1.6);
+    }, duration);
 }
 
-function createBurst(x, y) {
+function burst(x, y) {
     const b = document.createElement("div");
     b.className = "burst";
     b.style.left = `${x}px`; b.style.top = `${y}px`;
@@ -255,39 +245,26 @@ function createBurst(x, y) {
     setTimeout(() => b.remove(), 500);
 }
 
-function updateLifeUI() {
-    // 簡約心形：♥
-    document.getElementById('life').innerText = "♥".repeat(state.lives);
+function updateUI() {
+    document.getElementById('score').innerText = state.score;
+    const l = document.getElementById('life');
+    l.innerText = "♥".repeat(state.lives);
+    
+    // 生命危險視覺提示
+    if(state.lives === 1) {
+        document.body.classList.add('danger');
+    } else {
+        document.body.classList.remove('danger');
+    }
 }
 
-function endGame() {
-    state.isActive = false;
-    clearTimeout(timers.game);
-    clearInterval(timers.clock);
-
+function die() {
+    state.active = false;
+    clearTimeout(gameLoopTimeout);
     document.getElementById('game').classList.add("hidden");
     document.getElementById('result').classList.remove("hidden");
-    document.getElementById('finalScore').innerText = `Survived for ${state.time.toFixed(1)}s • Score ${state.score}`;
-    
-    generateLeaderboard();
-}
-
-function generateLeaderboard() {
-    const bots = ["luna", "alex", "noah", "mia", "zen"].map(n => ({
-        name: n, score: Math.floor(Math.random() * 1500) + 500
-    }));
-    bots.push({ name: "YOU", score: state.score, isPlayer: true });
-    bots.sort((a, b) => b.score - a.score);
-
-    let html = `<div style="font-size:12px; opacity:0.5; text-transform:uppercase; margin-bottom:10px;">Global Cache</div>`;
-    bots.forEach((entry, i) => {
-        const style = entry.isPlayer ? 'color:#fff; font-weight:bold;' : 'opacity:0.5;';
-        html += `<div style="display:flex; justify-content:space-between; margin:8px 0; font-size:15px; ${style}">
-            <span>${i + 1}. ${entry.name}</span>
-            <span>${entry.score}</span>
-        </div>`;
-    });
-    document.getElementById('leaderboard').innerHTML = html;
+    document.getElementById('finalScore').innerText = 
+        `${state.time.toFixed(1)}s uptime • ${state.score} score`;
 }
 </script>
 
