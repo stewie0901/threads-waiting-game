@@ -2,337 +2,363 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Threads Waiting Experience</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Threads Waiting Experience Pro</title>
 
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
 
 body {
     background:#000;
     color:#fff;
-    font-family:-apple-system, BlinkMacSystemFont, sans-serif;
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     overflow:hidden;
+    touch-action: none; /* 防止移動端縮放 */
 }
 
-/* ===== 共用 ===== */
 .center {
     position:absolute;
     top:50%;
     left:50%;
     transform:translate(-50%,-50%);
     text-align:center;
+    width: 90%;
 }
 
-.hidden { display:none; }
+.hidden { display:none !important; }
 
+/* 進場動畫優化 */
 .fade {
-    animation:fadeIn 0.8s ease forwards;
+    animation: fadeIn 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
 
 @keyframes fadeIn {
-    from { opacity:0; transform:translate(-50%,-40%); }
-    to { opacity:1; transform:translate(-50%,-50%); }
+    from { opacity:0; transform:translate(-50%,-45%) scale(0.95); }
+    to { opacity:1; transform:translate(-50%,-50%) scale(1); }
 }
 
-/* ===== Loading ===== */
+/* Logo 脈衝更柔和 */
 .logo {
-    font-size:60px;
+    font-size:80px;
+    font-weight: bold;
     opacity:0.85;
-    animation:pulse 1.8s infinite;
+    animation: pulse 2s ease-in-out infinite;
+    user-select: none;
 }
 
 @keyframes pulse {
-    0% { opacity:0.3; }
-    50% { opacity:1; }
-    100% { opacity:0.3; }
+    0%, 100% { opacity:0.3; transform: scale(0.9); }
+    50% { opacity:1; transform: scale(1); }
 }
 
 .subtext {
-    margin-top:10px;
+    margin-top:15px;
     font-size:14px;
     opacity:0.5;
+    letter-spacing: 0.5px;
 }
 
-/* ===== Button ===== */
 button {
     margin-top:25px;
-    padding:12px 28px;
+    padding:14px 32px;
     border-radius:999px;
     border:none;
     background:#fff;
     color:#000;
+    font-weight: 600;
     cursor:pointer;
-    transition:0.2s;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-button:hover { transform:scale(1.05); }
+button:hover { transform:scale(1.05); background: #eee; }
+button:active { transform:scale(0.95); }
 
-/* ===== Game ===== */
-#gameArea {
-    width:100vw;
-    height:100vh;
-    position:relative;
-}
+/* 遊戲物件優化 */
+#gameArea { width:100vw; height:100vh; position:relative; }
 
 .dot {
-    width:44px;
-    height:44px;
+    width:50px;
+    height:50px;
     border-radius:50%;
-    background:white;
     position:absolute;
     cursor:pointer;
-    animation:pop 0.2s ease;
+    animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 0 15px rgba(255,255,255,0.3);
 }
 
 @keyframes pop {
-    from { transform:scale(0.6); opacity:0; }
+    from { transform:scale(0); opacity:0; }
     to { transform:scale(1); opacity:1; }
 }
 
-/* 點擊爆炸 */
+/* 震動效果 */
+.shake { animation: shake 0.3s quick ease-in-out; }
+@keyframes shake {
+    0%, 100% { transform: translate(0,0); }
+    25% { transform: translate(-5px, 5px); }
+    50% { transform: translate(5px, -5px); }
+    75% { transform: translate(-5px, -5px); }
+}
+
 .burst {
     position:absolute;
-    width:44px;
-    height:44px;
+    width:50px;
+    height:50px;
     border-radius:50%;
     border:2px solid white;
-    animation:burst 0.4s ease-out forwards;
+    pointer-events: none;
+    animation: burst 0.5s ease-out forwards;
 }
 
 @keyframes burst {
-    to { transform:scale(2); opacity:0; }
+    to { transform:scale(2.5); opacity:0; border-width: 0px; }
 }
 
-/* HUD */
+/* HUD 質感提升 */
 #hud {
     position:fixed;
-    top:15px;
-    left:15px;
-    font-size:14px;
-    opacity:0.85;
+    top:20px;
+    left:20px;
+    font-size:16px;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    z-index: 100;
 }
 
-/* Result */
+#hud div { margin-bottom: 4px; opacity: 0.8; }
+
 .card {
-    background:rgba(255,255,255,0.05);
-    padding:25px;
-    border-radius:18px;
-    backdrop-filter:blur(12px);
+    background:rgba(255,255,255,0.08);
+    padding:40px 30px;
+    border-radius:24px;
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
-#leaderboard div {
-    margin:6px 0;
-    opacity:0.85;
+#leaderboard {
+    margin-top: 20px;
+    text-align: left;
+    max-width: 250px;
+    margin-left: auto;
+    margin-right: auto;
 }
 </style>
 </head>
-
 <body>
 
-<!-- Loading -->
 <div id="loading" class="center fade">
     <div class="logo">@</div>
-    <div class="subtext">Loading your feed...</div>
+    <div class="subtext">Gathering threads...</div>
 </div>
 
-<!-- Error -->
 <div id="error" class="center hidden fade">
-    <div style="font-size:20px;">
-        The feed is taking a breath.
-    </div>
-    <div class="subtext">
-        Servers are slower than usual.
-    </div>
-    <div class="subtext">
-        You're not alone — stay with us.
-    </div>
-
-    <button onclick="startGame()">Tap while you wait</button>
+    <div style="font-size:22px; font-weight:600;">Servers are daydreaming.</div>
+    <div class="subtext">The feed is a bit slow today.</div>
+    <button onclick="startGame()">Interactive Wait</button>
 </div>
 
-<!-- Game -->
 <div id="game" class="hidden">
     <div id="gameArea"></div>
-
     <div id="hud">
-        <div>Score: <span id="score">0</span></div>
+        <div>Score: <b id="score">0</b></div>
         <div>Time: <span id="time">0.0</span>s</div>
         <div>Combo: <span id="combo">0</span></div>
-        <div>Life: <span id="life">🤍🤍🤍🤍🤍</span></div>
+        <div id="life"></div>
     </div>
 </div>
 
-<!-- Result -->
 <div id="result" class="center hidden fade">
     <div class="card">
-        <h2>Session Result</h2>
-        <p id="finalScore"></p>
-
+        <h2 style="margin-bottom:10px;">Session Over</h2>
+        <p id="finalScore" style="opacity:0.8; margin-bottom:20px;"></p>
         <div id="leaderboard"></div>
-
-        <button onclick="restart()">Try again</button>
+        <button onclick="location.reload()">Refresh Feed</button>
     </div>
 </div>
 
 <script>
-let score=0, combo=0, time=0;
-let speed=900;
-let lives=5;
-const maxLives=5;
+// 遊戲配置
+const CONFIG = {
+    initialSpeed: 1000,
+    minSpeed: 400,
+    speedDecrement: 15,
+    maxLives: 5,
+    colors: ['#FFFFFF', '#FF3B30', '#5856D6', '#FF9500', '#FF2D55']
+};
 
-let gameInterval, timerInterval;
+let state = {
+    score: 0,
+    combo: 0,
+    time: 0,
+    speed: CONFIG.initialSpeed,
+    lives: CONFIG.maxLives,
+    isActive: false
+};
 
-// 🎧 音效（Web Audio）
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let timers = { game: null, clock: null };
+let audioCtx;
 
-function playClickSound(){
+// 初始化音訊 (修復移動端需觸發才能播放的問題)
+function initAudio() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+}
+
+function playClickSound(isHit = true) {
+    if (!audioCtx) return;
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-
+    
     osc.type = "triangle";
-    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-
+    osc.frequency.setValueAtTime(isHit ? 400 + (state.combo * 20) : 150, audioCtx.currentTime);
+    
     gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.2);
-
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+    
     osc.connect(gain);
     gain.connect(audioCtx.destination);
-
     osc.start();
-    osc.stop(audioCtx.currentTime+0.2);
+    osc.stop(audioCtx.currentTime + 0.2);
 }
 
-// Loading → Error
-setTimeout(()=>{
-    loading.classList.add("hidden");
-    error.classList.remove("hidden");
-},2500);
+// 介面導航
+setTimeout(() => {
+    if(!state.isActive) {
+        document.getElementById('loading').classList.add("hidden");
+        document.getElementById('error').classList.remove("hidden");
+    }
+}, 2500);
 
-function startGame(){
-    error.classList.add("hidden");
-    game.classList.remove("hidden");
+function startGame() {
+    initAudio();
+    state.isActive = true;
+    document.getElementById('error').classList.add("hidden");
+    document.getElementById('game').classList.remove("hidden");
 
-    score=0; combo=0; time=0;
-    speed=900; lives=5;
     updateLives();
+    scheduleNextSpawn();
 
-    gameInterval=setInterval(spawnDot, speed);
-
-    timerInterval=setInterval(()=>{
-        time+=0.1;
-        timeDisplay.innerText=time.toFixed(1);
-    },100);
+    timers.clock = setInterval(() => {
+        state.time += 0.1;
+        document.getElementById('time').innerText = state.time.toFixed(1);
+    }, 100);
 }
 
-function spawnDot(){
-    const dot=document.createElement("div");
-    dot.className="dot";
+function scheduleNextSpawn() {
+    if (!state.isActive) return;
+    timers.game = setTimeout(() => {
+        spawnDot();
+        scheduleNextSpawn();
+    }, state.speed);
+}
 
-    const x=Math.random()*(window.innerWidth-50);
-    const y=Math.random()*(window.innerHeight-50);
+function spawnDot() {
+    const dot = document.createElement("div");
+    dot.className = "dot";
+    
+    // 隨機顏色與位置
+    const size = 50;
+    const x = Math.random() * (window.innerWidth - size);
+    const y = Math.random() * (window.innerHeight - size);
+    const color = CONFIG.colors[Math.floor(Math.random() * CONFIG.colors.length)];
 
-    dot.style.left=x+"px";
-    dot.style.top=y+"px";
+    Object.assign(dot.style, {
+        left: `${x}px`,
+        top: `${y}px`,
+        backgroundColor: color
+    });
 
-    dot.onclick=()=>{
-        playClickSound();
-
-        score+=10+combo*3;
-        combo++;
-
-        if(lives<maxLives){ lives++; updateLives(); }
-
-        createBurst(x,y);
-        dot.remove();
-        updateHUD();
+    dot.onpointerdown = (e) => {
+        e.stopPropagation();
+        hitDot(dot, x, y);
     };
 
-    gameArea.appendChild(dot);
+    document.getElementById('gameArea').appendChild(dot);
 
-    setTimeout(()=>{
-        if(dot.parentNode){
-            dot.remove();
-            combo=0;
-            lives--;
-            updateLives();
-
-            if(lives<=0) endGame();
+    // 圓點生命週期
+    setTimeout(() => {
+        if (dot.parentNode) {
+            missDot(dot);
         }
-    },speed);
+    }, state.speed * 1.5);
+}
 
-    if(speed>450){
-        speed-=10;
-        clearInterval(gameInterval);
-        gameInterval=setInterval(spawnDot, speed);
-    }
-
+function hitDot(dot, x, y) {
+    playClickSound(true);
+    state.score += 10 + (state.combo * 2);
+    state.combo++;
+    if (state.speed > CONFIG.minSpeed) state.speed -= CONFIG.speedDecrement;
+    
+    createBurst(x, y);
+    dot.remove();
     updateHUD();
 }
 
-function createBurst(x,y){
-    const burst=document.createElement("div");
-    burst.className="burst";
-    burst.style.left=x+"px";
-    burst.style.top=y+"px";
-    gameArea.appendChild(burst);
-    setTimeout(()=>burst.remove(),400);
+function missDot(dot) {
+    dot.remove();
+    state.combo = 0;
+    state.lives--;
+    playClickSound(false);
+    document.body.classList.add('shake');
+    setTimeout(() => document.body.classList.remove('shake'), 300);
+    
+    updateLives();
+    updateHUD();
+    if (state.lives <= 0) endGame();
 }
 
-function updateHUD(){
-    scoreDisplay.innerText=score;
-    comboDisplay.innerText=combo;
+function createBurst(x, y) {
+    const burst = document.createElement("div");
+    burst.className = "burst";
+    burst.style.left = `${x}px`;
+    burst.style.top = `${y}px`;
+    document.getElementById('gameArea').appendChild(burst);
+    setTimeout(() => burst.remove(), 500);
 }
 
-function updateLives(){
-    lifeDisplay.innerText="🤍".repeat(lives);
+function updateHUD() {
+    document.getElementById('score').innerText = state.score;
+    document.getElementById('combo').innerText = state.combo;
 }
 
-function endGame(){
-    clearInterval(gameInterval);
-    clearInterval(timerInterval);
+function updateLives() {
+    document.getElementById('life').innerText = "🤍".repeat(state.lives) + "🖤".repeat(CONFIG.maxLives - state.lives);
+}
 
-    game.classList.add("hidden");
-    result.classList.remove("hidden");
+function endGame() {
+    state.isActive = false;
+    clearTimeout(timers.game);
+    clearInterval(timers.clock);
 
-    finalScore.innerText=
-        `You stayed ${time.toFixed(1)}s · Score ${score}`;
-
+    document.getElementById('game').classList.add("hidden");
+    document.getElementById('result').classList.remove("hidden");
+    document.getElementById('finalScore').innerText = `Survived for ${state.time.toFixed(1)}s • ${state.score} pts`;
+    
     generateLeaderboard();
 }
 
-function generateLeaderboard(){
-    const names=["luna","alex","noah","mia","zen"];
-    let data=names.map(n=>({
-        name:n,
-        score:Math.floor(Math.random()*2000)+600
+function generateLeaderboard() {
+    const botNames = ["luna", "alex", "noah", "mia", "zen"];
+    const entries = botNames.map(name => ({
+        name,
+        score: Math.floor(Math.random() * 1500) + 500
     }));
 
-    data.push({name:"you",score});
-    data.sort((a,b)=>b.score-a.score);
+    entries.push({ name: "YOU", score: state.score, isPlayer: true });
+    entries.sort((a, b) => b.score - a.score);
 
-    let html="<h3>Global waiting scores (cached)</h3>";
-    data.forEach((p,i)=>{
-        html+=`<div>${i+1}. ${p.name} — ${p.score}</div>`;
+    let html = `<div style="font-weight:600; margin-bottom:10px; opacity:0.6; font-size:12px; text-transform:uppercase;">Global Standings</div>`;
+    entries.forEach((entry, i) => {
+        const isPlayer = entry.isPlayer ? 'color:#fff; font-weight:bold;' : 'opacity:0.6;';
+        html += `<div style="display:flex; justify-content:space-between; margin:8px 0; font-size:15px; ${isPlayer}">
+            <span>${i + 1}. ${entry.name}</span>
+            <span>${entry.score}</span>
+        </div>`;
     });
-
-    leaderboard.innerHTML=html;
+    document.getElementById('leaderboard').innerHTML = html;
 }
-
-function restart(){ location.reload(); }
-
-// DOM
-const loading=document.getElementById("loading");
-const error=document.getElementById("error");
-const game=document.getElementById("game");
-const result=document.getElementById("result");
-
-const gameArea=document.getElementById("gameArea");
-const scoreDisplay=document.getElementById("score");
-const comboDisplay=document.getElementById("combo");
-const timeDisplay=document.getElementById("time");
-const leaderboard=document.getElementById("leaderboard");
-const finalScore=document.getElementById("finalScore");
-const lifeDisplay=document.getElementById("life");
 </script>
 
 </body>
